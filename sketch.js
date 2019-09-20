@@ -2,7 +2,7 @@ var loadedFont;
 var inputString, pressed, counter, pressedkey, textInputSize;
 var w, h, centerx, centery;
 
-var PATH = "https://peopleguesser.github.io/assets/";//"assets/";
+var PATH = "assets/";
 
 function preload() {
 
