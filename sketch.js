@@ -99,7 +99,7 @@ function draw() {
 		sizew = larger_width
 
 		var gap_w = (sizew/(total_rounds - 1));
-		var r = gap_w * 0.2;
+		var r = gap_w * 0.24;
 		posy = (h*.11) + screenoffset_y;
 
 			fill(210);
@@ -107,7 +107,7 @@ function draw() {
 		{	
 			//What to draw
 			if (i >= score.length)
-				fill(210);
+				fill(240);
 			else
 			if (score[i] == true)
 				fill(66, 245, 102);
