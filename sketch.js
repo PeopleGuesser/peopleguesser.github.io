@@ -2,7 +2,7 @@
 //////////////////////////////////////////////////////////////////////////////////// // 
 //////////////////////////////////////////////////////////////////////////////////// // 
 //Visual variables
-var loadedFont, loadedFrame, loadedBackground;
+var loadedFont, loadedFrame, loadedBackground, picx, picy, picsw, picsh;
 var inputString, pressed, counter, pressedkey, textInputSize;
 var w, h, centerx, centery;
 var button_scale;
@@ -17,7 +17,7 @@ var person_picture;
 var CURRENT_DIFFICULTY;
 var clock_to_next_level;
 
-var PATH = "assets/";
+var PATH = "https://peopleguesser.github.io/assets/";//"assets/";
 //#endregion
 
 function preload() {
@@ -25,7 +25,7 @@ function preload() {
 	//Load fonts and images
 	loadedFont = loadFont(PATH + "font.otf");
 	loadedBackground = loadImage(PATH + "background.png");
-	loadedFrame = loadImage(PATH + "frame.png");
+	loadedFrame = loadImage(PATH + "photoframe.png");
 }
 
 function setup() {
@@ -100,7 +100,7 @@ function draw() {
 	//////////////////////////////////////////////////////////////////////////////////// // 
 	//////////////////////////////////////////////////////////////////////////////////// // 
 	//Photo
-	sizeh = medium_width;
+	sizeh = medium_width*1.1;
 	sizew = sizeh;
 	posy = (h*0.4);
 
@@ -112,8 +112,10 @@ function draw() {
 	rect(centerx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh, sizew*0.02);
 
 	//Picture
+	if (loadedFrame)
+		image(loadedFrame, centerx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh);
 	if (person_picture)
-		image(person_picture, centerx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh);
+		//image(person_picture, centerx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh);
 
 	//////////////////////////////////////////////////////////////////////////////////// // 
 	//////////////////////////////////////////////////////////////////////////////////// // 
@@ -294,7 +296,35 @@ function requestNewPerson(dificulty)
 {
 	//Request new
 	CORRECT_ANSWER = "Pedro Álvares Cabral";
+
+	//Picture
 	person_picture = loadImage("https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Pedro_Alvares_Cabral.jpg/200px-Pedro_Alvares_Cabral.jpg");
+	if (person_picture.width == person_picture.height)
+	{
+		picx = 0;
+		picy = 0;
+		picsw = person_picture.width;
+		picsh = person_picture.height;
+	}
+	else
+	if (person_picture.width > person_picture.height)
+	{
+		var dif = person_picture.width - person_picture.height;
+		picx = dif * 0.5;
+		picy = 0;
+		picsw = person_picture.height;
+		picsh = person_picture.height;
+	}
+	else
+	{
+		var dif = person_picture.height - person_picture.width;
+		picx = 0;
+		picy = dif * 0.5;
+		picsw = person_picture.width;
+		picsh = person_picture.width;
+	}
+
+	//Hint
 	person_hint = "";
 }
 //#endregion
