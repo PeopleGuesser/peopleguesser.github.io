@@ -4,9 +4,11 @@
 //Visual variables
 var loadedFont, loadedFrame, loadedBackground, picx, picy, picsw, picsh;
 var inputString, pressed, counter, pressedkey, textInputSize;
-var w, h, centerx, centery;
+var w, h, centerx, centery, screenoffset_y, screenoffset_x;
 var button_scale;
 var button_opacity;
+
+var SCREEN;
 
 //Variaveis de jogo
 var score;
@@ -38,6 +40,8 @@ function setup() {
 	textInputSize = 0.78;
 	
 	//Game variables
+	SCREEN = 1;
+
 	clock_to_next_level = 0;
 	person_picture = -1;
 	person_hint = "";
@@ -56,6 +60,8 @@ function setup() {
 	button_opacity = 1;
 	
 	//Create Canvas
+	screenoffset_y = 0;
+	screenoffset_x = 0;
 	updateScreen();
 	createCanvas(w, h);
 }
@@ -74,104 +80,119 @@ function draw() {
 	var medium_width = min(w*0.8, h*0.4);
 
 	if (loadedFrame)
-		image(loadedBackground, 0, (cos(time * 0.001) - 1) * w * 0.01, max(w, h*1.77777), max(w,h*1.77777) * 0.5625);
+		image(loadedBackground, 0, (cos(time * 0.001) - 1) * w * 0.01, max(w, h*1.77777), max(w,h*1.77777) * 0.565);
 
 	//////////////////////////////////////////////////////////////////////////////////// // 
 	//////////////////////////////////////////////////////////////////////////////////// // 
-	//Strikes
-	sizew = larger_width
-
-	var gap_w = (sizew/(total_rounds - 1));
-	var r = gap_w * 0.2;
-	posy = (h*.11);
-
-		fill(210);
-	for(var i = 0; i < total_rounds; i++)
-	{	
-		//What to draw
-		if (i >= score.length)
-			fill(210);
-		else
-		if (score[i] == true)
-			fill(66, 245, 102);
-		else 
-			fill(245, 61, 70);
-
-		//Draw
-		circle( i * gap_w + (centerx - sizew * 0.5), posy, r);
-	}
-
-	//////////////////////////////////////////////////////////////////////////////////// // 
-	//////////////////////////////////////////////////////////////////////////////////// // 
-	//Photo
-	
-
-	//Faixa
-		sizeh = medium_width;
-		posy = (h*0.4);
-		sizew = w*2;
-		fill(20, 20, 20, 255 * (cos(time * 0.0005) * 0.1 + 0.9));
-	rect(centerx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh);
-
-	//Picture
-	sizeh = medium_width*1.2;
-	sizew = sizeh;
-	posx = centerx;
-	
-	if (loadedFrame)
-		image(loadedFrame, posx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh);
-	if (person_picture)
+	//TELA DE TITULO DO JOGO
+	if (SCREEN == 0)
 	{
-		sizeh *= 0.74;
-		sizew = sizeh;
-		posy *= 0.929;
-		image(person_picture, posx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh, picx, picy, picsw, picsh);
+
 	}
+	else
+	//PRIMEIRA TELA DO JOGO
+	if (SCREEN == 1)
+	{
+		//////////////////////////////////////////////////////////////////////////////////// // 
+		//////////////////////////////////////////////////////////////////////////////////// // 
+		//Strikes
+		sizew = larger_width
 
-	//////////////////////////////////////////////////////////////////////////////////// // 
-	//////////////////////////////////////////////////////////////////////////////////// // 
-	//Input Field
-	sizew = larger_width;
-	posy = (h*0.6925);
+		var gap_w = (sizew/(total_rounds - 1));
+		var r = gap_w * 0.2;
+		posy = (h*.11) + screenoffset_y;
 
-	  sizeh = medium_width*0.16;
-	  fill(220);
-	rect(centerx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh, sizew*0.02);
-	
-	//textFont(loadedFont);
-		fill(10);
-		textFont(loadedFont);
-		textAlign(CENTER, CENTER);
-		textSize( sizeh * textInputSize * 0.93);
+			fill(210);
+		for(var i = 0; i < total_rounds; i++)
+		{	
+			//What to draw
+			if (i >= score.length)
+				fill(210);
+			else
+			if (score[i] == true)
+				fill(66, 245, 102);
+			else 
+				fill(245, 61, 70);
+
+			//Draw
+			circle( i * gap_w + (centerx - sizew * 0.5), posy, r);
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////// // 
+		//////////////////////////////////////////////////////////////////////////////////// // 
+		//Faixa
+			sizeh = medium_width;
+			posy = (h*0.4) + screenoffset_y;
+			sizew = w*2;
+			fill(20, 20, 20, 255 * (cos(time * 0.0005) * 0.05 + 0.95));
+		rect(centerx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh);
+
+		//Picture
+		sizeh = medium_width*1.2;
+		sizew = sizeh;
+		posx = centerx;
 		
-	var show_text = inputString;
-	if (floor(time * 0.0025) % 2 == 0 && inputString == "")
-		show_text += "|"
-	text( show_text, centerx, posy*0.995);
+		if (loadedFrame)
+			image(loadedFrame, posx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh);
+		if (person_picture)
+		{
+			sizeh *= 0.74;
+			sizew = sizeh;
+			posy *= 0.929;
+			image(person_picture, posx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh, picx, picy, picsw, picsh);
+		}
 
-	//////////////////////////////////////////////////////////////////////////////////// // 
-	//////////////////////////////////////////////////////////////////////////////////// // 
-	//Buttom
-	posy = (h*0.8);
+		//////////////////////////////////////////////////////////////////////////////////// // 
+		//////////////////////////////////////////////////////////////////////////////////// // 
+		//Input Field
+		sizew = larger_width;
+		posy = (h*0.6925) + screenoffset_y;
 
-	var tvalue = ((mouseX > centerx - sizew*0.5*button_scale && mouseX < centerx + sizew*0.5*button_scale &&
-	mouseY > posy - sizeh*0.5*button_scale && mouseY < posy + sizeh*0.5*button_scale) ? 1.05 : 1);
-	button_scale += (tvalue - button_scale) * deltaTime * 0.02;
-	button_opacity = 0.95 + (button_scale - 1)*10;
-	
-	textSize( sizeh*0.75*button_scale);
-	  fill(20, 20, 20, button_opacity*255);
-	rect(centerx - sizew*0.5*button_scale, posy - sizeh*0.5*button_scale, sizew*button_scale, sizeh*button_scale, sizew*0.02);
-	  fill(230);
-	text("Confirm", centerx, posy*0.995);
-	
-	//////////////////////////////////////////////////////////////////////////////////// // 
-	//////////////////////////////////////////////////////////////////////////////////// // 
-	//Input processor
-	keyboardBufferProcess();
+		sizeh = medium_width*0.16;
+		fill(220);
+		rect(centerx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh, sizew*0.02);
+		
+		//textFont(loadedFont);
+			fill(10);
+			textFont(loadedFont);
+			textAlign(CENTER, CENTER);
+			textSize( sizeh * textInputSize * 0.93);
+			
+		var show_text = inputString;
+		if (floor(time * 0.0025) % 2 == 0 && inputString == "")
+			show_text += "|"
+		text( show_text, centerx, posy*0.995);
 
-	//Clock procesor
-	clockTick();
+		//////////////////////////////////////////////////////////////////////////////////// // 
+		//////////////////////////////////////////////////////////////////////////////////// // 
+		//Buttom
+		posy = (h*0.8) + screenoffset_y;
+
+		var tvalue = ((mouseX > centerx - sizew*0.5*button_scale && mouseX < centerx + sizew*0.5*button_scale &&
+		mouseY > posy - sizeh*0.5*button_scale && mouseY < posy + sizeh*0.5*button_scale) ? 1.05 : 1);
+		button_scale += (tvalue - button_scale) * deltaTime * 0.02;
+		button_opacity = 0.95 + (button_scale - 1)*10;
+		
+		textSize( sizeh*0.75*button_scale);
+		fill(20, 20, 20, button_opacity*255);
+		rect(centerx - sizew*0.5*button_scale, posy - sizeh*0.5*button_scale, sizew*button_scale, sizeh*button_scale, sizew*0.02);
+		fill(230);
+		text("Confirm", centerx, posy*0.995);
+
+		//////////////////////////////////////////////////////////////////////////////////// // 
+		//////////////////////////////////////////////////////////////////////////////////// // 
+		//Input processor
+		keyboardBufferProcess();
+
+		//Clock procesor
+		clockTick();
+	}
+	else
+	//TELE DE ENDGAME DO JOGO
+	if (SCREEN == 2)
+	{
+
+	}
 }
 
 //#region Keyboard processing and reading
