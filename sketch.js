@@ -116,17 +116,21 @@ function draw() {
 			fill(210);
 		for(var i = 0; i < total_rounds; i++)
 		{	
-			//What to draw
-			if (i >= score.length)
-				fill(240);
-			else
-			if (score[i] == true)
-				fill(66, 245, 102);
-			else 
-				fill(245, 61, 70);
-
-			//Draw
+			//Draw base circle
+			fill(240);
 			circle( i * gap_w + (centerx - sizew * 0.5), posy, r);
+
+			//Draw icons
+			if (i < score.length)
+			{
+				//What to draw
+				var icons = r*4;
+
+				if (score[i] == true)
+					image(loadedIconC, i * gap_w + (centerx - sizew * 0.5) - icons*.5, posy - icons*.5, icons, icons);
+				else 
+					image(loadedIconW, i * gap_w + (centerx - sizew * 0.5) - icons*.5, posy - icons*.5, icons, icons);
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////////////// // 
@@ -181,11 +185,11 @@ function draw() {
 		{
 			if (stamp_progress < 1)
 			{
-				stamp_progress += (0.005 + (stamp_progress * 0.1))* deltaTime;
+				stamp_progress += (0.0045 + (stamp_progress * 0.025))* deltaTime;
 				if (stamp_progress > 1)
 				{
 					stamp_progress = 1;
-					pic_scale += .05;
+					pic_scale += .035;
 				}
 			}
 			
