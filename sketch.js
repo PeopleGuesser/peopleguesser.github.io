@@ -7,7 +7,7 @@ var PATH = "https://peopleguesser.github.io/assets/";//"assets/";
 function preload() {
 
 	//Load fonts and images
-	loadedFont = loadFont(PATH + "font.ttf");
+	loadedFont = loadFont(PATH + "BigShouldersText-ExtraBold.ttf");
 }
 
 function setup() {
@@ -138,7 +138,7 @@ function registerInput(key)
 	}
 	
 	//Compute
-	textInputSize = ((init_value - flex_value) + flex_value * pow(1 - (max(0, inputString.length - start_len) / (total_len - start_len)), 2));
+	textInputSize = ((init_value - flex_value) + flex_value * pow(1 - (max(0, inputString.length - start_len) / (total_len - start_len)), 1.45));
 
 	print( textInputSize);
 }
