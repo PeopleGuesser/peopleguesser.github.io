@@ -51,6 +51,7 @@ function setup() {
 	requestNewPerson(CURRENT_DIFFICULTY);
 	
 	//Buttons fields
+	posx = 0;
 	button_scale = 1;
 	button_opacity = 1;
 	
@@ -64,13 +65,16 @@ function draw() {
 	//////////////////////////////////////////////////////////////////////////////////// // 
 	// Clear Screen
 	updateScreen();
-	background(250);
+
 	strokeWeight(0);
 	var time = millis();
 	var sizew, sizeh, posy, posx;
 
 	var larger_width = min(w*0.8, h*0.6);
 	var medium_width = min(w*0.8, h*0.4);
+
+	if (loadedFrame)
+		image(loadedBackground, 0, (cos(time * 0.001) - 1) * w * 0.01, max(w, h*1.77777), max(w,h*1.77777) * 0.5625);
 
 	//////////////////////////////////////////////////////////////////////////////////// // 
 	//////////////////////////////////////////////////////////////////////////////////// // 
@@ -100,22 +104,29 @@ function draw() {
 	//////////////////////////////////////////////////////////////////////////////////// // 
 	//////////////////////////////////////////////////////////////////////////////////// // 
 	//Photo
-	sizeh = medium_width*1.1;
-	sizew = sizeh;
-	posy = (h*0.4);
+	
 
-	  sizew = w*2;
-	  fill(230);
+	//Faixa
+		sizeh = medium_width;
+		posy = (h*0.4);
+		sizew = w*2;
+		fill(20, 20, 20, 255 * (cos(time * 0.0005) * 0.1 + 0.9));
 	rect(centerx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh);
-	  sizew = sizeh;
-	  fill(20);
-	rect(centerx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh, sizew*0.02);
 
 	//Picture
+	sizeh = medium_width*1.2;
+	sizew = sizeh;
+	posx = centerx;
+	
 	if (loadedFrame)
-		image(loadedFrame, centerx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh);
+		image(loadedFrame, posx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh);
 	if (person_picture)
-		//image(person_picture, centerx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh);
+	{
+		sizeh *= 0.74;
+		sizew = sizeh;
+		posy *= 0.929;
+		image(person_picture, posx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh, picx, picy, picsw, picsh);
+	}
 
 	//////////////////////////////////////////////////////////////////////////////////// // 
 	//////////////////////////////////////////////////////////////////////////////////// // 
@@ -141,7 +152,7 @@ function draw() {
 	//////////////////////////////////////////////////////////////////////////////////// // 
 	//////////////////////////////////////////////////////////////////////////////////// // 
 	//Buttom
-	posy = (h*0.82);
+	posy = (h*0.8);
 
 	var tvalue = ((mouseX > centerx - sizew*0.5*button_scale && mouseX < centerx + sizew*0.5*button_scale &&
 	mouseY > posy - sizeh*0.5*button_scale && mouseY < posy + sizeh*0.5*button_scale) ? 1.05 : 1);
@@ -164,6 +175,13 @@ function draw() {
 }
 
 //#region Keyboard processing and reading
+function mouseClicked() {
+	if (button_opacity > 0.96 && clock_to_next_level == 0)
+	{
+		validateAnswerComplete();
+	}
+}
+
 function updateScreen()
 {
 	// Update screen size and metrics
@@ -266,21 +284,31 @@ function validateAnswerComplete()
 	//Make sure the new round has started
 	if (clock_to_next_level == 0)
 	{
-		//Validate and save result
-		is_the_answer_right = validateAnswer(inputString);
-		print( is_the_answer_right);
+		if (inputString.length > 0)
+		{
+			//Visual Effct
+			button_scale += .1;
 
-		//Reset buffer
-		pressed = false;
-		pressedkey = "";
-		counter = 0;
-		inputString = "";
+			//Validate and save result
+			is_the_answer_right = validateAnswer(inputString);
+			print( is_the_answer_right);
 
-		//Set clock
-		clock_to_next_level = 600;
+			//Reset buffer
+			pressed = false;
+			pressedkey = "";
+			counter = 0;
+			inputString = "";
 
-		//Record historic
-		score.push(is_the_answer_right);
+			//Set clock
+			clock_to_next_level = 600;
+
+			//Record historic
+			score.push(is_the_answer_right);
+		}
+		else
+		{
+			//Nope
+		}
 	}
 }
 
@@ -298,7 +326,14 @@ function requestNewPerson(dificulty)
 	CORRECT_ANSWER = "Pedro Álvares Cabral";
 
 	//Picture
-	person_picture = loadImage("https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Pedro_Alvares_Cabral.jpg/200px-Pedro_Alvares_Cabral.jpg");
+	person_picture = loadImage("https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Pedro_Alvares_Cabral.jpg/200px-Pedro_Alvares_Cabral.jpg", setupPicSize());
+
+	//Hint
+	person_hint = "";
+}
+
+function setupPicSize()
+{
 	if (person_picture.width == person_picture.height)
 	{
 		picx = 0;
@@ -323,8 +358,9 @@ function requestNewPerson(dificulty)
 		picsw = person_picture.width;
 		picsh = person_picture.width;
 	}
-
-	//Hint
-	person_hint = "";
 }
 //#endregion
+
+function windowResized() {
+	resizeCanvas(windowWidth, windowHeight);
+}
