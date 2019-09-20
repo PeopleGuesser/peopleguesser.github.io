@@ -23,7 +23,7 @@ var PATH = "https://peopleguesser.github.io/assets/";//"assets/";
 function preload() {
 
 	//Load fonts and images
-	loadedFont = loadFont(PATH + "font.ttf");
+	loadedFont = loadFont(PATH + "font.otf");
 }
 
 function setup() {
@@ -117,7 +117,7 @@ function draw() {
 	//////////////////////////////////////////////////////////////////////////////////// // 
 	//Input Field
 	sizew = larger_width;
-	posy = (h*0.692);
+	posy = (h*0.66);
 
 	  sizeh = medium_width*0.16;
 	  fill(220);
@@ -125,14 +125,14 @@ function draw() {
 	
 	//textFont(loadedFont);
 		fill(10);
-		textFont("Corbel");
+		textFont(loadedFont);
 		textAlign(CENTER, CENTER);
-		textSize( sizeh * textInputSize * 0.9);
+		textSize( sizeh * textInputSize * 0.93);
 		
 	var show_text = inputString;
 	if (floor(time * 0.0025) % 2 == 0 && inputString == "")
 		show_text += "|"
-	text( show_text, centerx, posy*1.005);
+	text( show_text, centerx, posy);
 
 	//////////////////////////////////////////////////////////////////////////////////// // 
 	//////////////////////////////////////////////////////////////////////////////////// // 
@@ -144,11 +144,11 @@ function draw() {
 	button_scale += (tvalue - button_scale) * deltaTime * 0.02;
 	button_opacity = 0.95 + (button_scale - 1)*10;
 	
-	textSize( sizeh*0.7*button_scale);
+	textSize( sizeh*0.75*button_scale);
 	  fill(20, 20, 20, button_opacity*255);
 	rect(centerx - sizew*0.5*button_scale, posy - sizeh*0.5*button_scale, sizew*button_scale, sizeh*button_scale, sizew*0.02);
 	  fill(230);
-	text("Confirm", centerx, posy*1.005);
+	text("Confirm", centerx, posy);
 	
 	//////////////////////////////////////////////////////////////////////////////////// // 
 	//////////////////////////////////////////////////////////////////////////////////// // 
