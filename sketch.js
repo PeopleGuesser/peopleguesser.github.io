@@ -1,13 +1,15 @@
 var loadedFont;
 var inputString, pressed, counter, pressedkey, textInputSize;
 var w, h, centerx, centery;
+var button_scale;
+var button_opacity;
 
 var PATH = "assets/";
 
 function preload() {
 
 	//Load fonts and images
-	loadedFont = loadFont(PATH + "BigShouldersText-ExtraBold.ttf");
+	loadedFont = loadFont(PATH + "font.ttf");
 }
 
 function setup() {
@@ -19,21 +21,30 @@ function setup() {
 	counter = 0;
 	textInputSize = 0.78;
 	
+	//Buttons fields
+	button_scale = 1;
+	button_opacity = 1;
+	
 	//Create Canvas
 	updateScreen();
 	createCanvas(w, h);
 }
 
 function draw() {
-
+	//////////////////////////////////////////////////////////////////////////////////// // 
+	//////////////////////////////////////////////////////////////////////////////////// // 
 	// Clear Screen
 	updateScreen();
 	background(250);
 	strokeWeight(0);
 	var time = millis();
 
+	//////////////////////////////////////////////////////////////////////////////////// // 
+	//////////////////////////////////////////////////////////////////////////////////// // 
 	//Strikes
 
+	//////////////////////////////////////////////////////////////////////////////////// // 
+	//////////////////////////////////////////////////////////////////////////////////// // 
 	//Photo
 	var sizew, sizeh, posy, posx;
 	sizeh = min(w*0.8, h*0.4);
@@ -47,6 +58,8 @@ function draw() {
 	  fill(20);
 	rect(centerx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh, sizew*0.02);
 
+	//////////////////////////////////////////////////////////////////////////////////// // 
+	//////////////////////////////////////////////////////////////////////////////////// // 
 	//Input Field
 	sizew = min(w*0.8, h*0.6);
 	posy = (h*0.692);
@@ -57,20 +70,30 @@ function draw() {
 	
 	//textFont(loadedFont);
 		fill(10);
-		textFont(loadedFont);
+		textFont("Corbel");
 		textAlign(CENTER, CENTER);
-		textSize( sizeh * textInputSize);
+		textSize( sizeh * textInputSize * 0.9);
 		
 	var show_text = inputString;
 	if (floor(time * 0.0025) % 2 == 0 && inputString == "")
 		show_text += "|"
-	text(show_text, centerx, posy*0.995);
+	text( show_text, centerx, posy*1.005);
 
+	//////////////////////////////////////////////////////////////////////////////////// // 
+	//////////////////////////////////////////////////////////////////////////////////// // 
 	//Buttom
 	posy = (h*0.82);
 
-	  fill(20);
-	rect(centerx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh, sizew*0.02);
+	var tvalue = ((mouseX > centerx - sizew*0.5*button_scale && mouseX < centerx + sizew*0.5*button_scale &&
+	mouseY > posy - sizeh*0.5*button_scale && mouseY < posy + sizeh*0.5*button_scale) ? 1.05 : 1);
+	button_scale += (tvalue - button_scale) * deltaTime * 0.02;
+	button_opacity = 0.95 + (button_scale - 1)*10;
+	
+	textSize( sizeh*0.7*button_scale);
+	  fill(20, 20, 20, button_opacity*255);
+	rect(centerx - sizew*0.5*button_scale, posy - sizeh*0.5*button_scale, sizew*button_scale, sizeh*button_scale, sizew*0.02);
+	  fill(230);
+	text("Confirm", centerx, posy*1.005);
 	
 	//Input processor
 	keyboardBufferProcess();
@@ -123,7 +146,7 @@ function registerInput(key)
 {
 	//Size
 	var init_value = 0.78;
-	var flex_value = 0.365;
+	var flex_value = 0.375;
 	var start_len = 16;
 	var total_len = 40;
 	
