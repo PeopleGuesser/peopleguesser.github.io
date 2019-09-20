@@ -2,9 +2,10 @@
 //////////////////////////////////////////////////////////////////////////////////// // 
 //////////////////////////////////////////////////////////////////////////////////// // 
 //Visual variables
-var loadedFont, loadedFrame, loadedBackground, picx, picy, picsw, picsh;
+var loadedFont, loadedFrame, loadedBackground, loadedIconC, loadedIconW, loadedStampC, loadedStampW, stamp_it, stamp_progress, pic_scale;
+var picx, picy, picsw, picsh, picstatus;
 var inputString, pressed, counter, pressedkey, textInputSize;
-var w, h, centerx, centery, screenoffset_y, screenoffset_x;
+var w, h, centerx, centery, screenoffset_y, screenoffset_x, picture_posx;
 var button_scale;
 var button_opacity;
 
@@ -28,9 +29,21 @@ function preload() {
 	loadedFont = loadFont(PATH + "font.otf");
 	loadedBackground = loadImage(PATH + "background.png");
 	loadedFrame = loadImage(PATH + "photoframe.png");
+
+	loadedIconC = loadImage(PATH + "icon_correct.png");
+	loadedIconW = loadImage(PATH + "icon_wrong.png");
+	loadedStampC = loadImage(PATH + "stamp_correct.png");
+	loadedStampW = loadImage(PATH + "stamp_wrong.png");
+
 }
 
 function setup() {
+
+	//Create Canvas
+	screenoffset_y = 0;
+	screenoffset_x = 0;
+	updateScreen();
+	createCanvas(w, h);
 
 	//Initialize visual variables
 	inputString = "";
@@ -38,6 +51,10 @@ function setup() {
 	pressedkey = "";
 	counter = 0;
 	textInputSize = 0.78;
+	picstatus = 0;
+	stamp_it = 0;
+	stamp_progress = 0;
+	pic_scale = 1;
 	
 	//Game variables
 	SCREEN = 1;
@@ -53,17 +70,11 @@ function setup() {
 	CURRENT_DIFFICULTY = 0;
 	
 	requestNewPerson(CURRENT_DIFFICULTY);
-	
+
 	//Buttons fields
-	posx = 0;
+	picture_posx = picture_posx = w * 1.5;;
 	button_scale = 1;
 	button_opacity = 1;
-	
-	//Create Canvas
-	screenoffset_y = 0;
-	screenoffset_x = 0;
-	updateScreen();
-	createCanvas(w, h);
 }
 
 function draw() {
@@ -80,7 +91,7 @@ function draw() {
 	var medium_width = min(w*0.8, h*0.4);
 
 	if (loadedFrame)
-		image(loadedBackground, 0, (cos(time * 0.0002) - 1) * w * 0.01, max(w, h*1.77777) * 1.01, max(w,h*1.77777) * 0.5625 * 1.01);
+		image(loadedBackground, 0, (cos(time * 0.0003) - 1) * w * 0.01, max(w, h*1.77777) * 1.01, max(w,h*1.77777) * 0.5625 * 1.01);
 
 	//////////////////////////////////////////////////////////////////////////////////// // 
 	//////////////////////////////////////////////////////////////////////////////////// // 
@@ -128,18 +139,69 @@ function draw() {
 		rect(centerx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh);
 
 		//Picture
-		sizeh = medium_width*1.2;
+		if (pic_scale > 1)
+		{
+			pic_scale -= 0.0004*deltaTime;
+			if (pic_scale < 1)
+				pic_scale = 1;
+		}
+		
+		sizeh = medium_width*1.2*pic_scale;
 		sizew = sizeh;
-		posx = centerx;
+
+		if (picstatus == 0)
+		{
+			picture_posx += (centerx - picture_posx) * deltaTime * 0.0042;
+		}
+		else 
+		{
+			picture_posx += ((centerx - w) - picture_posx) * deltaTime * 0.0025;
+			if (picture_posx < w * -0.4)
+			{
+				//Scroll Picture
+				picture_posx = w * 1.5;
+				picstatus = 0;
+				stamp_it = 0;
+
+				//Next Person
+				requestNewPerson();
+			}
+		}
 		
 		if (loadedFrame)
-			image(loadedFrame, posx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh);
+			image(loadedFrame, picture_posx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh);
 		if (person_picture)
 		{
 			sizeh *= 0.74;
 			sizew = sizeh;
 			posy *= 0.929;
-			image(person_picture, posx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh, picx, picy, picsw, picsh);
+			image(person_picture, picture_posx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh, picx, picy, picsw, picsh);
+		}
+		if (stamp_it)
+		{
+			if (stamp_progress < 1)
+			{
+				stamp_progress += (0.005 + (stamp_progress * 0.1))* deltaTime;
+				if (stamp_progress > 1)
+				{
+					stamp_progress = 1;
+					pic_scale += .05;
+				}
+			}
+			
+			sizeh = medium_width*(2.5 - stamp_progress);
+			sizew = sizeh;
+
+			if (stamp_it == 1)
+			{
+				//Right
+				image(loadedStampC, picture_posx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh);
+			}
+			else
+			{
+				//Wrong
+				image(loadedStampW, picture_posx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh);
+			}
 		}
 
 		//////////////////////////////////////////////////////////////////////////////////// // 
@@ -312,7 +374,8 @@ function validateAnswerComplete()
 
 			//Validate and save result
 			is_the_answer_right = validateAnswer(inputString);
-			print( is_the_answer_right);
+			stamp_it = (is_the_answer_right == true ? 1: 2);
+			stamp_progress = 0;
 
 			//Reset buffer
 			pressed = false;
@@ -321,7 +384,7 @@ function validateAnswerComplete()
 			inputString = "";
 
 			//Set clock
-			clock_to_next_level = 600;
+			clock_to_next_level = 950;
 
 			//Record historic
 			score.push(is_the_answer_right);
@@ -336,9 +399,14 @@ function validateAnswerComplete()
 function clockTick()
 {
 	if (clock_to_next_level > 0)
+	{
 		clock_to_next_level -= deltaTime;
-	if (clock_to_next_level < 0)
-		clock_to_next_level = 0;
+		if (clock_to_next_level < 0)
+		{
+			clock_to_next_level = 0;
+			picstatus = 1;
+		}
+	}
 }
 
 function requestNewPerson(dificulty)
