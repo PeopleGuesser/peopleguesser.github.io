@@ -1,11 +1,13 @@
-var LeafyFont;
+var loadedFont;
 var inputString;
 var w, h, centerx, centery;
+
+var PATH = "https://peopleguesser.github.io/assets/";//"assets/";
 
 function preload() {
 
 	//Load fonts and images
-	LeafyFont = loadFont("assets/leafy.otf");
+	loadedFont = loadFont(PATH + "font.ttf");
 }
 
 function setup() {
@@ -48,14 +50,16 @@ function draw() {
 	  fill(220);
 	rect(centerx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh, sizew*0.025);
 	
-	//textFont(LeafyFont);
+	//textFont(loadedFont);
 		fill(10);
-		textFont(LeafyFont);
+		textFont(loadedFont);
 		textAlign(CENTER, CENTER);
+		var multiplier_size = (35 - max(0, inputString.length - 15))/35;
+		textSize(sizeh*(0.5 + 0.4*multiplier_size));
 	var show_text = inputString;
 	if (floor(time * 0.0025) % 2 == 0 && inputString == "")
 		show_text += "|"
-	text(show_text, centerx - sizew*0.5, posy - sizeh*0.5);
+	text(show_text, centerx, posy);
 
 	//Buttom
 	posy = (h*0.82);
@@ -78,12 +82,12 @@ function updateScreen()
 function keyPressed() {
 
 	//Getting user input
-	if ((key >= 'a' && key <= 'z') || (key >= "A" && key <= "Z") || (key >= '0' && key <= '9') || key == " ")
+	if (true == true)
 	{	
 		if (key == "Backspace")
-			inputString = "";
+			inputString = inputString.substring(0, inputString.length - 1);
 		else
-		if (key.length == 1)
+		if (key.length == 1 && inputString.length < 50)
 			inputString += key;
 	}
 }
