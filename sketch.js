@@ -2,7 +2,7 @@
 //////////////////////////////////////////////////////////////////////////////////// // 
 //////////////////////////////////////////////////////////////////////////////////// // 
 //Visual variables
-var loadedFont;
+var loadedFont, loadedFrame, loadedBackground;
 var inputString, pressed, counter, pressedkey, textInputSize;
 var w, h, centerx, centery;
 var button_scale;
@@ -17,13 +17,15 @@ var person_picture;
 var CURRENT_DIFFICULTY;
 var clock_to_next_level;
 
-var PATH = "https://peopleguesser.github.io/assets/";//"assets/";
+var PATH = "assets/";
 //#endregion
 
 function preload() {
 
 	//Load fonts and images
 	loadedFont = loadFont(PATH + "font.otf");
+	loadedBackground = loadImage(PATH + "background.png");
+	loadedFrame = loadImage(PATH + "frame.png");
 }
 
 function setup() {
@@ -117,7 +119,7 @@ function draw() {
 	//////////////////////////////////////////////////////////////////////////////////// // 
 	//Input Field
 	sizew = larger_width;
-	posy = (h*0.66);
+	posy = (h*0.6925);
 
 	  sizeh = medium_width*0.16;
 	  fill(220);
@@ -132,7 +134,7 @@ function draw() {
 	var show_text = inputString;
 	if (floor(time * 0.0025) % 2 == 0 && inputString == "")
 		show_text += "|"
-	text( show_text, centerx, posy);
+	text( show_text, centerx, posy*0.995);
 
 	//////////////////////////////////////////////////////////////////////////////////// // 
 	//////////////////////////////////////////////////////////////////////////////////// // 
@@ -148,7 +150,7 @@ function draw() {
 	  fill(20, 20, 20, button_opacity*255);
 	rect(centerx - sizew*0.5*button_scale, posy - sizeh*0.5*button_scale, sizew*button_scale, sizeh*button_scale, sizew*0.02);
 	  fill(230);
-	text("Confirm", centerx, posy);
+	text("Confirm", centerx, posy*0.995);
 	
 	//////////////////////////////////////////////////////////////////////////////////// // 
 	//////////////////////////////////////////////////////////////////////////////////// // 
@@ -209,9 +211,9 @@ function registerInput(key)
 {
 	//Size
 	var init_value = 0.78;
-	var flex_value = 0.375;
+	var flex_value = 0.275;
 	var start_len = 16;
-	var total_len = 40;
+	var total_len = 35;
 	
 	//Getting user input
 	if (true == true)
@@ -222,7 +224,7 @@ function registerInput(key)
 		if (key == "Enter")
 			validateAnswerComplete();
 		else
-		if (key.length == 1 && inputString.length < 40)
+		if (key.length == 1 && inputString.length < 35)
 			inputString += key;
 	}
 	
