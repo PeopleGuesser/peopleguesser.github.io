@@ -2,7 +2,7 @@
 //////////////////////////////////////////////////////////////////////////////////// // 
 //////////////////////////////////////////////////////////////////////////////////// // 
 //Visual variables
-var loadedFont, loadedFrame, loadedBackground, loadedIconC, loadedIconW, loadedStampC, loadedStampW, stamp_it, stamp_progress, pic_scale;
+var loadedFont, loadedFrame, loadedPerson, isloadedPerson, loadedBackground, loadedIconC, loadedIconW, loadedStampC, loadedStampW, stamp_it, stamp_progress, pic_scale, last_icon_y;
 var picx, picy, picsw, picsh, picstatus;
 var inputString, pressed, counter, pressedkey, textInputSize;
 var w, h, centerx, centery, screenoffset_y, screenoffset_x, picture_posx;
@@ -16,7 +16,6 @@ var score;
 var total_rounds;
 var CORRECT_ANSWER;
 var person_hint;
-var person_picture;
 var CURRENT_DIFFICULTY;
 var clock_to_next_level;
 
@@ -27,7 +26,7 @@ function preload() {
 
 	//Load fonts and images
 	loadedFont = loadFont(PATH + "font.otf");
-	loadedBackground = loadImage(PATH + "background.png");
+	loadedBackground = loadImage(PATH + "background_light.png");
 	loadedFrame = loadImage(PATH + "photoframe.png");
 
 	loadedIconC = loadImage(PATH + "icon_correct.png");
@@ -55,12 +54,13 @@ function setup() {
 	stamp_it = 0;
 	stamp_progress = 0;
 	pic_scale = 1;
+	last_icon_y = 0;
+	isloadedPerson = false;
 	
 	//Game variables
 	SCREEN = 1;
 
 	clock_to_next_level = 0;
-	person_picture = -1;
 	person_hint = "";
 
 	score = [];
@@ -111,11 +111,21 @@ function draw() {
 
 		var gap_w = (sizew/(total_rounds - 1));
 		var r = gap_w * 0.24;
-		posy = (h*.11) + screenoffset_y;
+
+		if (last_icon_y < 0)
+		{
+			last_icon_y += 0.00035 * deltaTime;
+			if (last_icon_y > 0)
+				last_icon_y = 0;
+		}
 
 			fill(210);
 		for(var i = 0; i < total_rounds; i++)
 		{	
+			//Position
+			posy = (i == score.length - 1) ? (h*(.11 + last_icon_y)) : (h*.11);
+			posy += screenoffset_y;
+
 			//Draw base circle
 			fill(240);
 			circle( i * gap_w + (centerx - sizew * 0.5), posy, r);
@@ -124,7 +134,7 @@ function draw() {
 			if (i < score.length)
 			{
 				//What to draw
-				var icons = r*4;
+				var icons = r*3;
 
 				if (score[i] == true)
 					image(loadedIconC, i * gap_w + (centerx - sizew * 0.5) - icons*.5, posy - icons*.5, icons, icons);
@@ -159,11 +169,11 @@ function draw() {
 		}
 		else 
 		{
-			picture_posx += ((centerx - w) - picture_posx) * deltaTime * 0.0025;
-			if (picture_posx < w * -0.4)
+			picture_posx += ((-w) - picture_posx) * deltaTime * 0.0025;
+			if (picture_posx < w * -0.9)
 			{
 				//Scroll Picture
-				picture_posx = w * 1.5;
+				picture_posx = w * 1.8;
 				picstatus = 0;
 				stamp_it = 0;
 
@@ -174,12 +184,12 @@ function draw() {
 		
 		if (loadedFrame)
 			image(loadedFrame, picture_posx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh);
-		if (person_picture)
+		if (isloadedPerson == true)
 		{
 			sizeh *= 0.74;
 			sizew = sizeh;
 			posy *= 0.929;
-			image(person_picture, picture_posx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh, picx, picy, picsw, picsh);
+			image(loadedPerson, picture_posx - sizew*0.5, posy - sizeh*0.5, sizew, sizeh, picx, picy, picsw, picsh);
 		}
 		if (stamp_it)
 		{
@@ -193,7 +203,7 @@ function draw() {
 				}
 			}
 			
-			sizeh = medium_width*(2.5 - stamp_progress);
+			sizeh = medium_width*(2.35 - stamp_progress);
 			sizew = sizeh;
 
 			if (stamp_it == 1)
@@ -380,6 +390,7 @@ function validateAnswerComplete()
 			is_the_answer_right = validateAnswer(inputString);
 			stamp_it = (is_the_answer_right == true ? 1: 2);
 			stamp_progress = 0;
+			last_icon_y = -.035;
 
 			//Reset buffer
 			pressed = false;
@@ -416,40 +427,42 @@ function clockTick()
 function requestNewPerson(dificulty)
 {
 	//Request new
-	CORRECT_ANSWER = "Pedro Álvares Cabral";
+	CORRECT_ANSWER = "Nobel";
 
 	//Picture
-	person_picture = loadImage("https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Pedro_Alvares_Cabral.jpg/200px-Pedro_Alvares_Cabral.jpg", setupPicSize());
+	loadedPerson = loadImage("https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Mark_Noble_%2824707626906%29_%28cropped%29.jpg/250px-Mark_Noble_%2824707626906%29_%28cropped%29.jpg", img => {setupPicSize(img)});
 
 	//Hint
 	person_hint = "";
 }
 
-function setupPicSize()
+function setupPicSize(img)
 {
-	if (person_picture.width == person_picture.height)
+	isloadedPerson = true;
+
+	if (img.width == img.height)
 	{
 		picx = 0;
 		picy = 0;
-		picsw = person_picture.width;
-		picsh = person_picture.height;
+		picsw = img.width;
+		picsh = img.height;
 	}
 	else
-	if (person_picture.width > person_picture.height)
+	if (img.width > img.height)
 	{
-		var dif = person_picture.width - person_picture.height;
+		var dif = img.width - img.height;
 		picx = dif * 0.5;
 		picy = 0;
-		picsw = person_picture.height;
-		picsh = person_picture.height;
+		picsw = img.height;
+		picsh = img.height;
 	}
 	else
 	{
-		var dif = person_picture.height - person_picture.width;
+		var dif = img.height - img.width;
 		picx = 0;
 		picy = dif * 0.5;
-		picsw = person_picture.width;
-		picsh = person_picture.width;
+		picsw = img.width;
+		picsh = img.width;
 	}
 }
 //#endregion
